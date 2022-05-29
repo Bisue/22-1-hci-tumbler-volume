@@ -3,13 +3,20 @@ import numpy as np
 from pkg_resources import BINARY_DIST
 
 
-def find_tumbler(image):
+def find_tumbler(type, image):
     # grayscaled 이미지 변환
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # 이진화(otsu)
-    th, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    # cv2.bitwise_not(binary, binary)
+    # 이진화(canny or otsu)
+    if type == "canny":
+        binary = cv2.Canny(gray, 30, 220)
+        kernel = np.ones((3, 3), np.uint8)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+    elif type == "otsu":
+        th, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        # cv2.bitwise_not(binary, binary)
+
+    # 중간 과정 출력
     cv2.imwrite("./outputs/mid-binary-otsu.png", binary)
 
     # contours 찾기

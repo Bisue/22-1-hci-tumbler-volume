@@ -13,7 +13,7 @@ if video.isOpened() == False:
     exit()
 
 cv2.namedWindow("Guide")
-cv2.createTrackbar("size", "Guide", 0, 640, lambda x: x)
+cv2.createTrackbar("size", "Guide", 50, 300, lambda x: x)
 cv2.setTrackbarPos("size", "Guide", 150)
 
 # 웹캠 루프
@@ -55,14 +55,8 @@ while True:
     cv2.imshow("Guide", guide_image)
 
     # (테스트) filled contours
-    tumbler = find_tumbler(original_image)
+    tumbler = find_tumbler("otsu", original_image)
     cv2.imshow("Result", tumbler)
-    # tumbler_divided = tumbler.copy()
-    # # (배경이 더 밝을 때 - 반전)
-    # # 원본 이미지에 추출 영역 시각적으로 표현
-    # tumbler_divided = cv2.divide(tumbler_divided, np.ones_like(tumbler_divided) * 255)
-    # tumbler_divided = cv2.cvtColor(tumbler_divided, cv2.COLOR_GRAY2BGR)
-    # cv2.imshow("Original - Result", cv2.multiply(original_image, tumbler))
 
     # 타이머 끝나면 캡쳐
     if timer.is_capturing() and timer.done():

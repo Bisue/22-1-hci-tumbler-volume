@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from pkg_resources import BINARY_DIST
 
 
 def find_tumbler(image):
@@ -8,6 +9,8 @@ def find_tumbler(image):
 
     # 이진화(otsu)
     th, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    # cv2.bitwise_not(binary, binary)
+    cv2.imwrite("./outputs/mid-binary-otsu.png", binary)
 
     # contours 찾기
     contours = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)

@@ -17,7 +17,7 @@ def calc_volume(image, px_per_cm):
         radius = ((count / 2) / px_per_cm) * 0.92
         circle = math.pi * radius * radius
         volume += circle / px_per_cm
-        print("count, radius, circle, volume: ", count, radius, circle, volume)
+        # print("count, radius, circle, volume: ", count, radius, circle, volume)
 
     # 2. 원통형 가정
     # c_height = 0

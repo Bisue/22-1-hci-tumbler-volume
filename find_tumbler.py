@@ -41,6 +41,10 @@ def find_by_canny(image):
     result = np.zeros_like(binary)
     cv2.drawContours(result, [big_contour], 0, (255, 255, 255), cv2.FILLED)
 
+    # closing
+    kernel = np.ones((3, 3), np.uint8)
+    result = cv2.morphologyEx(result, cv2.MORPH_OPEN, kernel)
+
     return result
 
 

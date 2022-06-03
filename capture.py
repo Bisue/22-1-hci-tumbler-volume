@@ -135,6 +135,8 @@ while True:
 
         print("volume", calc_volume(tumbler, marker_width / marker_real_width))
 
+    elif k == ord("p"):
+        cv2.imwrite("./tumbler_binary.png", tumbler)
     # ESC를 누르면 캡쳐하지 않고 종료
     elif k == 27:
         break

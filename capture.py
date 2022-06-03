@@ -5,20 +5,27 @@ from utils.timer import CustomTimer
 from find_tumbler import find_tumbler, grabCut
 
 
-# 타이머
-timer = CustomTimer()
+# # 타이머
+# timer = CustomTimer()
 
-# 웹캠 이미지 해상도 (16:9)
-VIDEO_WIDTH = 1280
-VIDEO_HEIGHT = 720
-# 웹캠 디바이스
-video = cv2.VideoCapture(0)
-video.set(cv2.CAP_PROP_FRAME_WIDTH, VIDEO_WIDTH)
-video.set(cv2.CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT)
+# # 웹캠 이미지 해상도 (16:9)
+# VIDEO_WIDTH = 1280
+# VIDEO_HEIGHT = 720
+# # 웹캠 디바이스
+# video = cv2.VideoCapture(0)
+# video.set(cv2.CAP_PROP_FRAME_WIDTH, VIDEO_WIDTH)
+# video.set(cv2.CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT)
 
-if video.isOpened() == False:
-    print("카메라 디바이스를 찾지 못했습니다!")
-    exit()
+# if video.isOpened() == False:
+#     print("카메라 디바이스를 찾지 못했습니다!")
+#     exit()
+
+# (ret, original_image) = video.read()
+# original_image = cv2.imread("./outputs/keep-1/original.png")
+# original_image = cv2.imread("./coke-canny/original.png")
+original_image = cv2.imread("./input7.jpg")
+original_image = cv2.resize(original_image, (1200, 900))  # if big
+VIDEO_HEIGHT, VIDEO_WIDTH, _ = original_image.shape
 
 # 가이드 박스 조정 슬라이더
 cv2.namedWindow("Guide")
@@ -28,16 +35,6 @@ cv2.createTrackbar("y_offset", "Guide", 0, VIDEO_HEIGHT, lambda x: x)
 cv2.setTrackbarPos("size", "Guide", 300)
 cv2.setTrackbarPos("x_offset", "Guide", int(VIDEO_WIDTH / 2))
 cv2.setTrackbarPos("y_offset", "Guide", int(VIDEO_HEIGHT / 2))
-
-# cv2.namedWindow("Result")
-# cv2.createTrackbar("index", "Result", 0, 100, lambda x: x)
-# cv2.setTrackbarPos("index", "Result", 0)
-
-# (ret, original_image) = video.read()
-# original_image = cv2.imread("./outputs/keep-1/original.png")
-# original_image = cv2.imread("./coke-canny/original.png")
-original_image = cv2.imread("./input7.jpg")
-original_image = cv2.resize(original_image, (1200, 900))
 
 p1p2 = cv2.selectROI(original_image)
 
@@ -76,14 +73,14 @@ while True:
     guide_image = original_image.copy()
     cv2.rectangle(guide_image, marker_p1, marker_p2, (255, 0, 0), 1, cv2.LINE_AA)
 
-    # 타이머 실행중이면 처리하고 숫자 Display
-    if timer.is_capturing():
-        tr = timer.process_timer()
-        if not timer.done():
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(
-                guide_image, str(tr), (50, 100), font, 4, (0, 255, 255), 4, cv2.LINE_AA,
-            )
+    # # 타이머 실행중이면 처리하고 숫자 Display
+    # if timer.is_capturing():
+    #     tr = timer.process_timer()
+    #     if not timer.done():
+    #         font = cv2.FONT_HERSHEY_SIMPLEX
+    #         cv2.putText(
+    #             guide_image, str(tr), (50, 100), font, 4, (0, 255, 255), 4, cv2.LINE_AA,
+    #         )
 
     # 가이드 이미지 출력
     cv2.imshow("Guide", guide_image)
@@ -95,31 +92,33 @@ while True:
 
     cv2.imshow("Result", tumbler)
 
-    # 타이머 끝나면 캡쳐
-    if timer.is_capturing() and timer.done():
-        cv2.destroyAllWindows()
-        # 캡쳐 후 출력/저장
-        cv2.imshow("Original", original_image)
-        cv2.imwrite("./outputs/original.png", original_image)
-        # 가이드 캡쳐 후 출력/저장
-        cv2.imshow("Guide", guide_image)
-        cv2.imwrite("./outputs/guide.png", guide_image)
-        # (테스트) filled contours 캡쳐 후 출력/저장
-        cv2.imshow("Filled Contours", tumbler)
-        cv2.imwrite("./outputs/filled_contours.png", tumbler)
-        break
+    # # 타이머 끝나면 캡쳐
+    # if timer.is_capturing() and timer.done():
+    #     cv2.destroyAllWindows()
+    #     # 캡쳐 후 출력/저장
+    #     cv2.imshow("Original", original_image)
+    #     cv2.imwrite("./outputs/original.png", original_image)
+    #     # 가이드 캡쳐 후 출력/저장
+    #     cv2.imshow("Guide", guide_image)
+    #     cv2.imwrite("./outputs/guide.png", guide_image)
+    #     # (테스트) filled contours 캡쳐 후 출력/저장
+    #     cv2.imshow("Filled Contours", tumbler)
+    #     cv2.imwrite("./outputs/filled_contours.png", tumbler)
+    #     break
 
     # 키보드 입력
     k = cv2.waitKey(1)
 
     # Q를 누르면 카운트다운 시작
     if k == ord("q"):
-        timer.start_timer(5)
+        # timer.start_timer(5)
+        pass
     # T를 누르면 볼륨 계산
     elif k == ord("g"):
-        grabcut = grabCut(original_image)
-        cv2.imshow("grabcut", grabcut)
-        cv2.waitKey()
+        # grabcut = grabCut(original_image)
+        # cv2.imshow("grabcut", grabcut)
+        # cv2.waitKey()
+        pass
     elif k == ord("t"):
         volume = calc_volume(tumbler, marker_width / marker_real_width)
 
@@ -141,7 +140,7 @@ while True:
         break
 
 
-video.release()
+# video.release()
 
 cv2.waitKey()
 cv2.destroyAllWindows()

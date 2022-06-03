@@ -33,7 +33,7 @@ def find_by_canny(image):
 
     # contours 찾기
     contours, hierarchy = cv2.findContours(
-        binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+        binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
     big_contour = max(contours, key=cv2.contourArea)
 

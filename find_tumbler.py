@@ -1,8 +1,5 @@
 import cv2
-from cv2 import contourArea
 import numpy as np
-from pkg_resources import BINARY_DIST
-from regex import P
 
 
 def find_by_canny(image):

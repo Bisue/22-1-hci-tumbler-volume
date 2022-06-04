@@ -24,7 +24,7 @@ def setup_windows(w, h):
 
     # Guide window
     cv2.namedWindow("Guide")
-    cv2.resizeWindow('Guide', w, h)
+    cv2.resizeWindow("Guide", w, h)
     cv2.moveWindow("Guide", 0, 0)
     cv2.createTrackbar("size", "Guide", 0, w, lambda x: x)
     cv2.createTrackbar("x_offset", "Guide", 0, w, lambda x: x)
@@ -41,7 +41,7 @@ def setup_windows(w, h):
 # main
 if __name__ == "__main__":
     # CONFIGs
-    IMAGE_PATH = "./inputs/2.jpg"  # 입력 이미지 경로
+    IMAGE_PATH = "./inputs/8.jpg"  # 입력 이미지 경로
     MARKER_SIZE_CM = (8.56, 5.398)  # 카드(ID-1 규격)
     # MARKER_SIZE_CM = (8.6, 5.6)  # 민증
 
@@ -135,15 +135,16 @@ if __name__ == "__main__":
             # 결과 이미지 출력
             cv2.imshow("Result", result_image)
 
-            # 키보드 입력
-            k = cv2.waitKey()
-            # 아무 키나 누르면 결과 저장
+            # 결과 파일로 저장
             filename, extension = os.path.splitext(os.path.basename(IMAGE_PATH))
             cv2.imwrite("./outputs/" + filename + "-tumbler." + extension, tumbler)
             cv2.imwrite("./outputs/" + filename + "." + extension, result_image)
 
-            cv2.destroyWindow("Result")
+            # 키보드 입력
+            k = cv2.waitKey()
 
+            # 아무 키나 누르면 다시
+            cv2.destroyWindow("Result")
             continue
 
         # ESC를 누르면 종료

@@ -12,10 +12,10 @@ def find_by_canny(image):
     # gray = cv2.morphologyEx(gray,cv2.MORPH_BLACKHAT, kernel)
 
     # Edge 추출
-    binary = cv2.Canny(image, 30, 220)
+    binary = cv2.Canny(image, 30, 150)
 
     # Closing (끊어진 edge 연결)
-    kernel = np.ones((7, 7), np.uint8)
+    kernel = np.ones((3, 3), np.uint8)
     binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
 
     # Contours 찾고 가장 영역이 넓은 Contour 찾기
@@ -30,7 +30,7 @@ def find_by_canny(image):
 
     # Opening (노이즈 제거)
     kernel = np.ones((3, 3), np.uint8)
-    result = cv2.morphologyEx(result, cv2.MORPH_OPEN, kernel)
+    result = cv2.morphologyEx(result, cv2.MORPH_OPEN, kernel, iterations=5)
 
     return result
 

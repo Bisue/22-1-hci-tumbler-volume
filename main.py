@@ -2,55 +2,91 @@ import cv2
 from calc_volume import calc_volume
 from find_tumbler import find_tumbler
 
-if __name__ == "__main__":
-    original_image = cv2.imread("./inputs/1.jpg")
-    original_image = cv2.resize(original_image, (1200, 900))  # if big
-    VIDEO_HEIGHT, VIDEO_WIDTH, _ = original_image.shape
 
-    # 가이드 박스 조정 슬라이더
+# 이미지 비율 고정하고 사이즈 조정 (height 기준)
+def resize_aspect_ratio(image, height, inter=cv2.INTER_AREA):
+    (h, w) = image.shape[:2]
+
+    r = height / float(h)
+    size = (int(w * r), height)
+
+    resized = cv2.resize(image, size, interpolation=inter)
+
+    return resized
+
+
+# 윈도우 설정
+def setup_windows(w, h):
+    # Guide window
     cv2.namedWindow("Guide")
-    cv2.createTrackbar("size", "Guide", 0, VIDEO_WIDTH, lambda x: x)
-    cv2.createTrackbar("x_offset", "Guide", 0, VIDEO_WIDTH, lambda x: x)
-    cv2.createTrackbar("y_offset", "Guide", 0, VIDEO_HEIGHT, lambda x: x)
+    cv2.moveWindow("Guide", 0, 0)
+    cv2.createTrackbar("size", "Guide", 0, w, lambda x: x)
+    cv2.createTrackbar("x_offset", "Guide", 0, w, lambda x: x)
+    cv2.createTrackbar("y_offset", "Guide", 0, h, lambda x: x)
     cv2.setTrackbarPos("size", "Guide", 300)
-    cv2.setTrackbarPos("x_offset", "Guide", int(VIDEO_WIDTH / 2))
-    cv2.setTrackbarPos("y_offset", "Guide", int(VIDEO_HEIGHT / 2))
+    cv2.setTrackbarPos("x_offset", "Guide", int(w / 2))
+    cv2.setTrackbarPos("y_offset", "Guide", int(h / 2))
 
-    p1p2 = cv2.selectROI("ROI", original_image)
+    # Tumbler window
+    cv2.namedWindow("Tumbler")
+    cv2.moveWindow("Tumbler", w, 0)
+
+    # ROI window
+    cv2.namedWindow("ROI")
+    cv2.moveWindow("ROI", w, 0)
+
+
+# main
+if __name__ == "__main__":
+    # CONFIGs
+    IMAGE_PATH = "./inputs/1.jpg"  # 입력 이미지 경로
+    MARKER_SIZE_CM = (8.56, 5.398)  # 카드(ID-1 규격)
+    # MARKER_SIZE_CM = (8.6, 5.6)  # 민증
+
+    # 이미지 로드
+    original_image = cv2.imread(IMAGE_PATH)
+    # 이미지 로드 실패
+    if original_image is None:
+        print("이미지를 불러오지 못했습니다!")
+        exit()
+    # 너무 크면 화면에 들어오게 축소
+    if original_image.shape[0] >= 800:
+        original_image = resize_aspect_ratio(original_image, 800)
+
+    # 로드된 이미지 사이즈
+    image_height, image_width = original_image.shape[:2]
+
+    # 윈도우 설정 (Trackbar, 위치)
+    setup_windows(image_width, image_height)
+
+    # 텀블러 사각 영역 지정
+    tbx, tby, tbw, tbh = cv2.selectROI("ROI", original_image)
     cv2.destroyWindow("ROI")
 
-    # Original 웹캠 입력
-    print(p1p2)
-    object_region = original_image[
-        p1p2[1] : p1p2[1] + p1p2[3], p1p2[0] : p1p2[0] + p1p2[2]
-    ]
+    # 텀블러 사각 영역 이미지 Crop
+    object_region = original_image[tby : tby + tbh, tbx : tbx + tbw]
 
-    # 웹캠 루프
+    # 마커 사이즈 조정
     while True:
-        # 마커 크기 계산
-        # marker_real_width = 8.6 # 민증 규격(cm)
-        # marker_real_height = 5.6
-        marker_real_width = 8.56  # 카드 규격(cm)
-        marker_real_height = 5.398
-        marker_ratio = marker_real_height / marker_real_width  # 마커 가로/세로 비율
-        # 마커 픽셀 크기
+        # 마커 비율
+        marker_ratio = MARKER_SIZE_CM[1] / MARKER_SIZE_CM[0]  # 마커 가로/세로 비율
+        # 마커 크기(px)
         marker_width = cv2.getTrackbarPos("size", "Guide")  # 마커 width
         marker_height = marker_width * marker_ratio  # 마커 height
 
         # 마커 위치 설정
-        (height, width, _) = original_image.shape
-        x_offset = cv2.getTrackbarPos("x_offset", "Guide") - VIDEO_WIDTH / 2
-        y_offset = cv2.getTrackbarPos("y_offset", "Guide") - VIDEO_HEIGHT / 2
+        x_offset = cv2.getTrackbarPos("x_offset", "Guide") - image_width / 2
+        y_offset = cv2.getTrackbarPos("y_offset", "Guide") - image_height / 2
         marker_p1 = (
-            int(width / 2 - marker_width / 2 + x_offset),
-            int(height / 2 - marker_height / 2 + y_offset),
+            int(image_width / 2 - marker_width / 2 + x_offset),
+            int(image_height / 2 - marker_height / 2 + y_offset),
         )
         marker_p2 = (
-            int(width / 2 + marker_width / 2 + x_offset),
-            int(height / 2 + marker_height / 2 + y_offset),
+            int(image_width / 2 + marker_width / 2 + x_offset),
+            int(image_height / 2 + marker_height / 2 + y_offset),
         )
 
-        # guide_image: 사용자에게 보여줄 가이드(마커박스, 타이머 등)가 포함된 이미지
+        # guide_image: 사용자에게 보여줄 가이드 정보(마커 박스)가 포함된 이미지
         guide_image = original_image.copy()
         cv2.rectangle(guide_image, marker_p1, marker_p2, (255, 0, 0), 1, cv2.LINE_AA)
 
@@ -62,17 +98,18 @@ if __name__ == "__main__":
         # tumbler = find_tumbler("otsu", object_region, True)  # white bg, black obj
         tumbler = find_tumbler("canny", object_region)
 
-        cv2.imshow("Result", tumbler)
+        # 추출된 텀블러 이미지 출력
+        cv2.imshow("Tumbler", tumbler)
 
         # 키보드 입력
         k = cv2.waitKey(1)
 
         # T를 누르면 볼륨 계산
         if k == ord("t"):
-            volume = calc_volume(tumbler, marker_width / marker_real_width)
+            volume = calc_volume(tumbler, marker_width / MARKER_SIZE_CM[0])
 
-            rect_p1 = (p1p2[0], p1p2[1])
-            rect_p2 = (p1p2[0] + p1p2[2], p1p2[1] + p1p2[3])
+            rect_p1 = (tbx, tby)
+            rect_p2 = (tbx + tbw, tby + tbh)
             cv2.rectangle(
                 original_image, rect_p1, rect_p2, (255, 0, 0), 2,
             )
@@ -87,7 +124,7 @@ if __name__ == "__main__":
             cv2.imshow("final", original_image)
             cv2.waitKey()
 
-            print("volume", calc_volume(tumbler, marker_width / marker_real_width))
+            print("volume", calc_volume(tumbler, marker_width / MARKER_SIZE_CM[0]))
         # P를 누르면 추출 결과 Capture
         elif k == ord("p"):
             cv2.imwrite("./tumbler_binary.png", tumbler)
@@ -95,5 +132,4 @@ if __name__ == "__main__":
         elif k == 27:
             break
 
-    cv2.waitKey()
     cv2.destroyAllWindows()

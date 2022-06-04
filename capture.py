@@ -21,7 +21,7 @@ from find_tumbler import find_tumbler
 # (ret, original_image) = video.read()
 # original_image = cv2.imread("./outputs/keep-1/original.png")
 # original_image = cv2.imread("./coke-canny/original.png")
-original_image = cv2.imread("./input7.jpg")
+original_image = cv2.imread("./input/input7.jpg")
 original_image = cv2.resize(original_image, (1200, 900))  # if big
 VIDEO_HEIGHT, VIDEO_WIDTH, _ = original_image.shape
 
@@ -34,7 +34,8 @@ cv2.setTrackbarPos("size", "Guide", 300)
 cv2.setTrackbarPos("x_offset", "Guide", int(VIDEO_WIDTH / 2))
 cv2.setTrackbarPos("y_offset", "Guide", int(VIDEO_HEIGHT / 2))
 
-p1p2 = cv2.selectROI(original_image)
+p1p2 = cv2.selectROI("ROI", original_image)
+cv2.destroyWindow("ROI")
 
 # Original 웹캠 입력
 print(p1p2)

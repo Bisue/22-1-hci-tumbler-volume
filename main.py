@@ -1,3 +1,4 @@
+import os
 import cv2
 from calc_volume import calc_volume
 from find_tumbler import find_tumbler
@@ -17,6 +18,10 @@ def resize_aspect_ratio(image, height, inter=cv2.INTER_AREA):
 
 # 윈도우 설정
 def setup_windows(w, h):
+    # Tumbler window
+    cv2.namedWindow("Tumbler")
+    cv2.moveWindow("Tumbler", w, 0)
+
     # Guide window
     cv2.namedWindow("Guide")
     cv2.moveWindow("Guide", 0, 0)
@@ -27,19 +32,15 @@ def setup_windows(w, h):
     cv2.setTrackbarPos("x_offset", "Guide", int(w / 2))
     cv2.setTrackbarPos("y_offset", "Guide", int(h / 2))
 
-    # Tumbler window
-    cv2.namedWindow("Tumbler")
-    cv2.moveWindow("Tumbler", w, 0)
-
     # ROI window
     cv2.namedWindow("ROI")
-    cv2.moveWindow("ROI", w, 0)
+    cv2.moveWindow("ROI", 0, 0)
 
 
 # main
 if __name__ == "__main__":
     # CONFIGs
-    IMAGE_PATH = "./inputs/1.jpg"  # 입력 이미지 경로
+    IMAGE_PATH = "./inputs/5.jpg"  # 입력 이미지 경로
     MARKER_SIZE_CM = (8.56, 5.398)  # 카드(ID-1 규격)
     # MARKER_SIZE_CM = (8.6, 5.6)  # 민증
 
@@ -104,30 +105,46 @@ if __name__ == "__main__":
         # 키보드 입력
         k = cv2.waitKey(1)
 
-        # T를 누르면 볼륨 계산
-        if k == ord("t"):
-            volume = calc_volume(tumbler, marker_width / MARKER_SIZE_CM[0])
+        # Enter or T를 누르면 용량 계산
+        if k == 13 or k == ord("t"):
+            # 텀블러 용량 계산
+            volume = round(calc_volume(tumbler, marker_width / MARKER_SIZE_CM[0]), 2)
+            print("volume", volume)
 
+            # 결과 이미지
+            result_image = original_image.copy()
+
+            # 사용자가 선택한 텀블러 사각 영역 그리기
             rect_p1 = (tbx, tby)
             rect_p2 = (tbx + tbw, tby + tbh)
-            cv2.rectangle(
-                original_image, rect_p1, rect_p2, (255, 0, 0), 2,
-            )
+            cv2.rectangle(result_image, rect_p1, rect_p2, (255, 0, 0), 2)
+
+            # 텀블러 용량 텍스트로 그리기
+            text_p = (tbx, tby - 5)
             cv2.putText(
-                original_image,
-                str(volume),
-                rect_p1,
+                result_image,
+                str(volume) + "ml",
+                text_p,
                 cv2.FONT_HERSHEY_PLAIN,
                 1,
                 (0, 0, 255),
+                lineType=cv2.LINE_AA,
             )
-            cv2.imshow("final", original_image)
-            cv2.waitKey()
 
-            print("volume", calc_volume(tumbler, marker_width / MARKER_SIZE_CM[0]))
-        # P를 누르면 추출 결과 Capture
-        elif k == ord("p"):
-            cv2.imwrite("./tumbler_binary.png", tumbler)
+            # 결과 이미지 출력
+            cv2.imshow("Result", result_image)
+
+            # 키보드 입력
+            k = cv2.waitKey()
+            # 아무 키나 누르면 결과 저장
+            filename, extension = os.path.splitext(os.path.basename(IMAGE_PATH))
+            cv2.imwrite("./outputs/" + filename + "-tumbler." + extension, tumbler)
+            cv2.imwrite("./outputs/" + filename + "." + extension, result_image)
+
+            cv2.destroyWindow("Result")
+
+            continue
+
         # ESC를 누르면 종료
         elif k == 27:
             break

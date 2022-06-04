@@ -24,6 +24,7 @@ def setup_windows(w, h):
 
     # Guide window
     cv2.namedWindow("Guide")
+    cv2.resizeWindow('Guide', w, h)
     cv2.moveWindow("Guide", 0, 0)
     cv2.createTrackbar("size", "Guide", 0, w, lambda x: x)
     cv2.createTrackbar("x_offset", "Guide", 0, w, lambda x: x)
@@ -40,7 +41,7 @@ def setup_windows(w, h):
 # main
 if __name__ == "__main__":
     # CONFIGs
-    IMAGE_PATH = "./inputs/5.jpg"  # 입력 이미지 경로
+    IMAGE_PATH = "./inputs/2.jpg"  # 입력 이미지 경로
     MARKER_SIZE_CM = (8.56, 5.398)  # 카드(ID-1 규격)
     # MARKER_SIZE_CM = (8.6, 5.6)  # 민증
 
@@ -79,12 +80,12 @@ if __name__ == "__main__":
         x_offset = cv2.getTrackbarPos("x_offset", "Guide") - image_width / 2
         y_offset = cv2.getTrackbarPos("y_offset", "Guide") - image_height / 2
         marker_p1 = (
-            int(image_width / 2 - marker_width / 2 + x_offset),
-            int(image_height / 2 - marker_height / 2 + y_offset),
+            int(image_width / 2 + x_offset),
+            int(image_height / 2 + y_offset),
         )
         marker_p2 = (
-            int(image_width / 2 + marker_width / 2 + x_offset),
-            int(image_height / 2 + marker_height / 2 + y_offset),
+            int(image_width / 2 + marker_width + x_offset),
+            int(image_height / 2 + marker_height + y_offset),
         )
 
         # guide_image: 사용자에게 보여줄 가이드 정보(마커 박스)가 포함된 이미지

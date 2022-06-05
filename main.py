@@ -41,7 +41,7 @@ def setup_windows(w, h):
 # main
 if __name__ == "__main__":
     # CONFIGs
-    IMAGE_PATH = "./inputs/4.jpg"  # 입력 이미지 경로
+    IMAGE_PATH = "./inputs/6.jpg"  # 입력 이미지 경로
     MARKER_SIZE_CM = (8.56, 5.398)  # 카드(ID-1 규격)
     # MARKER_SIZE_CM = (8.6, 5.6)  # 민증
 

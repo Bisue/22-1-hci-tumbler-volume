@@ -4,7 +4,7 @@ import numpy as np
 
 def find_by_canny(image):
     # Image Blurring
-    image = cv2.GaussianBlur(image, (11, 11), 1)
+    image = cv2.GaussianBlur(image, (7, 7), 1)
 
     # Top-Hat
     # filterSize =(5,5)
@@ -14,23 +14,39 @@ def find_by_canny(image):
     # Edge 추출
     binary = cv2.Canny(image, 30, 150)
 
+    cv2.imshow("edge", binary)
+
     # Closing (끊어진 edge 연결)
     kernel = np.ones((3, 3), np.uint8)
-    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=5)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=10)
+
+    cv2.imshow("closing", binary)
 
     # Contours 찾고 가장 영역이 넓은 Contour 찾기
     contours, hierarchy = cv2.findContours(
         binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
+
+    # cnt = 0
+    # for contour in contours:
+    #     temp = np.zeros_like(binary)
+    #     cv2.drawContours(temp, [contour], 0, (255, 255, 255))
+    #     cv2.imshow("contour" + str(cnt), temp)
+    #     cnt += 1
+
     big_contour = max(contours, key=cv2.contourArea)
 
     # 검정 이미지에 가장 영역이 넓은 Contour 내부 채워서 그리기
     result = np.zeros_like(binary)
-    cv2.drawContours(result, [big_contour], 0, (255, 255, 255), cv2.FILLED)
+    cv2.drawContours(result, [big_contour], -1, (255, 255, 255), cv2.FILLED)
+
+    cv2.imshow("contour", result)
 
     # Opening (노이즈 제거)
     kernel = np.ones((3, 3), np.uint8)
     result = cv2.morphologyEx(result, cv2.MORPH_OPEN, kernel, iterations=5)
+
+    cv2.imshow("opening", result)
 
     return result
 

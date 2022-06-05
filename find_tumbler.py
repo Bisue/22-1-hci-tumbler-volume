@@ -45,6 +45,10 @@ def find_by_otsu(image, darker_object=False):
     if darker_object:
         cv2.bitwise_not(binary, binary)
 
+    # Opening (노이즈 제거)
+    kernel = np.ones((3, 3), np.uint8)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel, iterations=5)
+
     # Contours 찾고 가장 영역이 넓은 Contour 찾기
     contours, hierarchy = cv2.findContours(
         binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE

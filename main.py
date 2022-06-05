@@ -41,7 +41,7 @@ def setup_windows(w, h):
 # main
 if __name__ == "__main__":
     # CONFIGs
-    IMAGE_PATH = "./inputs/8.jpg"  # 입력 이미지 경로
+    IMAGE_PATH = "./inputs/4.jpg"  # 입력 이미지 경로
     MARKER_SIZE_CM = (8.56, 5.398)  # 카드(ID-1 규격)
     # MARKER_SIZE_CM = (8.6, 5.6)  # 민증
 
@@ -122,6 +122,8 @@ if __name__ == "__main__":
 
             # 텀블러 용량 텍스트로 그리기
             text_p = (tbx, tby - 5)
+            if text_p[1] <= 15:
+                text_p = (tbx + tbw + 5, tby + 15)
             cv2.putText(
                 result_image,
                 str(volume) + "ml",

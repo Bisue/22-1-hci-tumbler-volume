@@ -18,7 +18,7 @@ def find_by_canny(image):
 
     # Closing (끊어진 edge 연결)
     kernel = np.ones((3, 3), np.uint8)
-    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=10)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=5)
 
     cv2.imshow("closing", binary)
 

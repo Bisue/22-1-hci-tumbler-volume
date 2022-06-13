@@ -139,8 +139,8 @@ if __name__ == "__main__":
 
             # 결과 파일로 저장
             filename, extension = os.path.splitext(os.path.basename(IMAGE_PATH))
-            cv2.imwrite("./outputs/" + filename + "-tumbler." + extension, tumbler)
-            cv2.imwrite("./outputs/" + filename + "." + extension, result_image)
+            cv2.imwrite("./outputs/" + filename + "-tumbler" + extension, tumbler)
+            cv2.imwrite("./outputs/" + filename + extension, result_image)
 
             # 키보드 입력
             k = cv2.waitKey()
